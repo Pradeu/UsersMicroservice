@@ -20,7 +20,10 @@ namespace User.DB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DbUser>();
+            modelBuilder.Entity<DbUser>(entity =>
+            {
+                entity.HasIndex(e => e.Email).IsUnique();
+            });
         }
     }
 }

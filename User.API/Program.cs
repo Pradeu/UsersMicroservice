@@ -2,14 +2,15 @@ using AutoMapper;
 using User.DB;
 using User.API.Mapping;
 using Microsoft.EntityFrameworkCore;
+using User.API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors();
 builder.Services.AddDbContext<MainContext>(options =>
     options
-        .UseNpgsql(builder.Configuration.GetConnectionString("UserDB"))
+        .UseNpgsql(builder.Configuration.GetConnectionString("UserDb"))
         .UseCamelCaseNamingConvention()
         .EnableDetailedErrors()
     );
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<MainContext>(options =>
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddScoped<JwtService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -37,6 +39,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(options => options
+            .WithOrigins("http://localhost:3000")
+            .AllowCredentials()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            );
 app.UseAuthorization();
 
 app.MapControllers();

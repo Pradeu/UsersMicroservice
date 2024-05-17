@@ -1,4 +1,6 @@
-﻿namespace User.API.Models
+﻿using System.Text.Json.Serialization;
+
+namespace User.API.Models
 {
     public class DtoUser
     {

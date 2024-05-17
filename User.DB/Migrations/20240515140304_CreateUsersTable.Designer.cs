@@ -12,8 +12,8 @@ using User.DB;
 namespace User.DB.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20240512211011_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240515140304_CreateUsersTable")]
+    partial class CreateUsersTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,6 +55,10 @@ namespace User.DB.Migrations
 
                     b.HasKey("Id")
                         .HasName("pK_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("iX_users_email");
 
                     b.ToTable("users", (string)null);
                 });
