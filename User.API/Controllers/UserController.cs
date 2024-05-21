@@ -26,8 +26,9 @@ namespace User.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DtoUser>>> GetUsersAsync()
         {
-            var dbUsers = await _context.Users.ToListAsync();
-            return _mapper.Map<List<DtoUser>>(dbUsers);
+                var dbUsers = await _context.Users.ToListAsync();
+                Console.WriteLine("Количество пользователей, найденных в базе данных: " + dbUsers.Count);
+                return _mapper.Map<List<DtoUser>>(dbUsers);
         }
 
         [HttpGet("{id}")]
@@ -37,6 +38,7 @@ namespace User.API.Controllers
             Console.WriteLine(dbUser);
             if (dbUser == null)
             {
+                Console.WriteLine("Ошибка: пользователь с id " + id + " не найден");
                 return NotFound();
             }
 
@@ -51,18 +53,29 @@ namespace User.API.Controllers
             [FromBody] DtoUser dtoUser
         )
         {
-            var user = new DtoUser {
-                Name = dtoUser.Name,
-                Email = dtoUser.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(dtoUser.Password)};
-            var dbUser = _mapper.Map<DbUser>(user);
+            try {
+                var user = new DtoUser
+                {
+                    Name = dtoUser.Name,
+                    Email = dtoUser.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(dtoUser.Password)
+                };
+                var dbUser = _mapper.Map<DbUser>(user);
 
-            _context.Users.Add(dbUser);
-            await _context.SaveChangesAsync();
+                _context.Users.Add(dbUser);
+                await _context.SaveChangesAsync();
 
-            dtoUser = _mapper.Map<DtoUser>(dbUser);
+                dtoUser = _mapper.Map<DtoUser>(dbUser);
 
-            return dtoUser;
+                return dtoUser;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Не удалось зарегистрировать пользователя в системе");
+                return BadRequest(new {message = "Не удалось зарегистрировать пользователя в системе"});
+            }
+            
         }
 
 
@@ -73,10 +86,14 @@ namespace User.API.Controllers
         {
             var user = await _context.Users.FirstOrDefaultAsync(g => g.Email == dtoLogin.Email);
 
-            if (user == null) return BadRequest(new {message = "Данные неверны"});
+            if (user == null) {
+                Console.WriteLine("Ошибка: пользователя с такими данными нет в системе");
+                return BadRequest(new { message = "Данные неверны" }); 
+            } 
 
             if (!BCrypt.Net.BCrypt.Verify(dtoLogin.Password, user.Password))
             {
+                Console.WriteLine("Ошибка: неверно введен пароль от учетной записи");
                 return BadRequest(new { message = "Данные неверны" });
             }
 
@@ -104,6 +121,8 @@ namespace User.API.Controllers
             }
             catch(Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Ошибка: Вы не авторизовались в системе");
                 return Unauthorized();
             }
         }
