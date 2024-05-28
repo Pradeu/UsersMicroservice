@@ -1,5 +1,4 @@
-﻿
-using User.DB.Entities;
+﻿using User.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace User.DB
@@ -17,6 +16,7 @@ namespace User.DB
         }
 
         public DbSet<DbUser> Users { get; set; }
+        public DbSet<DbUserGame> UserGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +24,11 @@ namespace User.DB
             {
                 entity.HasIndex(e => e.Email).IsUnique();
             });
+
+            modelBuilder.Entity<DbUserGame>()
+                .HasOne(ug => ug.User)
+                .WithMany(u => u.UserGames)
+                .HasForeignKey(ug => ug.UserId);
         }
     }
 }

@@ -3,6 +3,7 @@ using User.DB;
 using User.API.Mapping;
 using Microsoft.EntityFrameworkCore;
 using User.API.Helpers;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,10 @@ builder.Services.AddDbContext<MainContext>(options =>
     );
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddEndpointsApiExplorer();
