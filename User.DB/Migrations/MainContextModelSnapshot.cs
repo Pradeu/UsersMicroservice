@@ -59,49 +59,6 @@ namespace User.DB.Migrations
 
                     b.ToTable("users", (string)null);
                 });
-
-            modelBuilder.Entity("User.DB.Entities.DbUserGame", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("GameId")
-                        .HasColumnType("integer")
-                        .HasColumnName("gameId");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("userId");
-
-                    b.HasKey("Id")
-                        .HasName("pK_userGames");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("iX_userGames_userId");
-
-                    b.ToTable("userGames", (string)null);
-                });
-
-            modelBuilder.Entity("User.DB.Entities.DbUserGame", b =>
-                {
-                    b.HasOne("User.DB.Entities.DbUser", "User")
-                        .WithMany("UserGames")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fK_userGames_users_userId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("User.DB.Entities.DbUser", b =>
-                {
-                    b.Navigation("UserGames");
-                });
 #pragma warning restore 612, 618
         }
     }

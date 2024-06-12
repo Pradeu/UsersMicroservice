@@ -10,8 +10,6 @@ namespace User.DB.Entities
         public required string Email { get; set; }
         [JsonIgnore] public string Password { get; set; }
 
-        public ICollection<DbUserGame> UserGames { get; set; }
-
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     }

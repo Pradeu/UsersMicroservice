@@ -16,7 +16,7 @@ namespace User.DB
         }
 
         public DbSet<DbUser> Users { get; set; }
-        public DbSet<DbUserGame> UserGames { get; set; }
+/*        public DbSet<DbGameStatus> GameStatus { get; set; }*/
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,11 +24,12 @@ namespace User.DB
             {
                 entity.HasIndex(e => e.Email).IsUnique();
             });
-
-            modelBuilder.Entity<DbUserGame>()
-                .HasOne(ug => ug.User)
+/*            modelBuilder.Entity<DbUserGame>()
+                .HasOne(ug => ug.Status)
                 .WithMany(u => u.UserGames)
-                .HasForeignKey(ug => ug.UserId);
+                .HasForeignKey(ug => ug.StatusId);*/
+
+            /*modelBuilder.Entity<DbGameStatus>();*/
         }
     }
 }

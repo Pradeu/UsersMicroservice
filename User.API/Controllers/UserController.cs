@@ -28,14 +28,14 @@ namespace User.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DtoUser>>> GetUsersAsync()
         {
-                var dbUsers = await _context.Users.Include(g => g.UserGames).ToListAsync();
+                var dbUsers = await _context.Users.ToListAsync();
                 return _mapper.Map<List<DtoUser>>(dbUsers);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<DtoUser>> GetUsersByIdAsync(int id)
         {
-            var dbUser = await _context.Users.Include(g => g.UserGames).FirstOrDefaultAsync(g => g.Id == id);
+            var dbUser = await _context.Users.FirstOrDefaultAsync(g => g.Id == id);
             Console.WriteLine(dbUser);
             if (dbUser == null)
             {
@@ -65,7 +65,7 @@ namespace User.API.Controllers
 
                 _context.Users.Add(dbUser);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Пользователь {dbUser.Name} зарегистрировался в {DateTimeOffset.UtcNow.}");
+                _logger.LogInformation($"Пользователь {dbUser.Name} зарегистрировался в {DateTimeOffset.UtcNow.UtcDateTime}");
                 dtoUser = _mapper.Map<DtoUser>(dbUser);
                 return dtoUser;
             }
@@ -77,13 +77,12 @@ namespace User.API.Controllers
             
         }
 
-
         [HttpPost("login")]
 
         public async Task<ActionResult<DtoLogin>> LoginUserAsync(
              [FromBody] DtoLogin dtoLogin)
         {
-            var user = await _context.Users.Include(g => g.UserGames).FirstOrDefaultAsync(g => g.Email == dtoLogin.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(g => g.Email == dtoLogin.Email);
 
             if (user == null)
             {
@@ -127,7 +126,7 @@ namespace User.API.Controllers
                 var jwt = Request.Cookies["jwt"];
                 var token = _jwtService.Verify(jwt);
                 int userId = int.Parse(token.Issuer);
-                var user = await _context.Users.Include(g => g.UserGames).FirstOrDefaultAsync(g => g.Id == userId);
+                var user = await _context.Users.FirstOrDefaultAsync(g => g.Id == userId);
 
                 return _mapper.Map<DtoUser>(user);
             }
@@ -144,42 +143,6 @@ namespace User.API.Controllers
             {
                 message = "Вы вышли из учетной записи"
             });
-        }
-
-        [HttpPost("addgame")]
-        public async Task<ActionResult<DtoUserGame>> PostUserGameList(
-            [FromBody] DtoUserGame dtoUserGame
-            )
-        {
-            var gameList = new DtoUserGame
-            {
-                UserId = dtoUserGame.UserId,
-                GameId = dtoUserGame.GameId,
-            };
-            var dbUserGame = _mapper.Map<DbUserGame>(gameList);
-
-            _context.UserGames.Add(dbUserGame);
-            await _context.SaveChangesAsync();
-
-            dtoUserGame = _mapper.Map<DtoUserGame>(dbUserGame);
-
-            return dtoUserGame;
-        }
-
-        [HttpPost("deletegame")]
-        public async Task<ActionResult<DtoUserGame>> DeleteUserGameList(int UserId, int GameId)
-        {
-            var data = await _context.UserGames.FirstOrDefaultAsync(game => game.UserId == UserId && game.GameId == GameId);
-
-            if (data == null)
-            {
-                return NotFound();
-            }
-
-            _context.UserGames.Remove(data);
-            await _context.SaveChangesAsync();
-
-            return Ok("Игра успешно удалена из списка");
         }
 
     }
