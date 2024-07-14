@@ -6,7 +6,7 @@ namespace User.API.Helpers
 {
     public class JwtService
     {
-        private readonly string secureKey = "there is a long and a very secure key";
+        private readonly string secureKey = ""; //В данную строку ввести свой предполагаемый ключ
         public string Generate(int id)
         {
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secureKey));
