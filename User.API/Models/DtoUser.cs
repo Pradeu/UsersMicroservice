@@ -9,8 +9,6 @@ namespace User.API.Models
         public required string Email { get; set; }
         public required string Password { get; set; }
 
-        public ICollection<int>? GamesList { get; set; }
-
         public DateTimeOffset CreatedAt { get; set; }
     }
 }
